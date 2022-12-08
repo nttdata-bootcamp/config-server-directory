@@ -1,0 +1,128 @@
+server:
+  port: '8090'
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    prefer-ip-address: true
+
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          default-label: master
+          uri: https://github.com/jhonatan-maza/bootcamp-gateway
+    discovery:
+      enabled: true
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: customer-service
+          uri: lb://bootcamp-customer
+          predicates:
+            - Path=/customer/**
+          filters:
+            - RewritePath=/customer/(?<path>.*), /$\{path}
+        - id: passive-service
+          uri: lb://bootcamp-passive
+          predicates:
+            - Path=/passive/**
+          filters:
+            - RewritePath=/passive/(?<path>.*), /$\{path}
+        - id: active-service
+          uri: lb://bootcamp-active
+          predicates:
+            - Path=/active/**
+          filters:
+            - RewritePath=/active/(?<path>.*), /$\{path}
+        - id: deposit-service
+          uri: lb://bootcamp-deposit
+          predicates:
+            - Path=/deposit/**
+          filters:
+            - RewritePath=/deposit/(?<path>.*), /$\{path}
+        - id: payment-service
+          uri: lb://bootcamp-payment
+          predicates:
+            - Path=/payment/**
+          filters:
+            - RewritePath=/payment/(?<path>.*), /$\{path}
+        - id: charge-consumption-service
+          uri: lb://bootcamp-charge-consumption
+          predicates:
+            - Path=/charge-consumption/**
+          filters:
+            - RewritePath=/charge-consumption/(?<path>.*), /$\{path}
+        - id: withdrawal-service
+          uri: lb://bootcamp-withdrawal
+          predicates:
+            - Path=/withdrawal/**
+          filters:
+            - RewritePath=/withdrawal/(?<path>.*), /$\{path}
+        - id: balance-service
+          uri: lb://bootcamp-balance
+          predicates:
+            - Path=/balance/**
+          filters:
+            - RewritePath=/balance/(?<path>.*), /$\{path}
+        - id: movement-service
+          uri: lb://bootcamp-movement
+          predicates:
+            - Path=/movement/**
+          filters:
+            - RewritePath=/movement/(?<path>.*), /$\{path}
+        - id: openapi
+          uri: http://localhost:${server.port}
+          predicates:
+            - Path=/v3/api-docs/**
+          filters:
+            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
+        #routes[0]:
+        #id: bootcamp-customer
+        #predicates: Path=/customer/**
+        #filters: StripPrefix=1
+        #uri: lb://bootcamp-customer
+    loadbalancer:
+      ribbon:
+        enabled: false
+  application:
+    name: bootcamp-gateway
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: customer
+        url: /bootcamp-customer/api-docs/
+      - name: passive
+        url: /bootcamp-passive/api-docs/
+      - name: active
+        url: /bootcamp-active/api-docs/
+      - name: deposit
+        url: /bootcamp-deposit/api-docs/
+      - name: payment
+        url: /bootcamp-payment/api-docs/
+      - name: charge-consumption
+        url: /bootcamp-charge-consumption/api-docs/
+      - name: withdrawal
+        url: /bootcamp-withdrawal/api-docs/
+      - name: balance
+        url: /bootcamp-balance/api-docs/
+      - name: movement
+        url: /bootcamp-movement/api-docs/

@@ -1,0 +1,39 @@
+server:
+  port: ${PORT:${SERVER_PORT:0}}
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://bootcamp:eo4IaJNIbjk4f8ls@cluster0.hlzdcri.mongodb.net/customer?retryWrites=true&w=majority
+  cloud:
+    config:
+      server:
+        git:
+          default-label: master
+          uri: https://github.com/jhonatan-maza/bootcamp-customer
+  application:
+    name: bootcamp-customer
+
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    instance-id: ${spring.application.name}:${localhost:${random.value}}
+    service-url:
+      default-zone: http://localhost:8761/eureka
+    prefer-ip-address: true
+
+springdoc:
+  packagesToScan: com.nttdata.bootcamp
+
+resilience4j.circuitbreaker:
+  instances:
+    customer:
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      permittedNumberOfCallsInHalfOpenState: 3
+      slidingWindowType: TIME_BASED
+      minimumNumberOfCalls: 4
+      waitDurationInOpenState: 2s
+      failureRateThreshold: 50
+      eventConsumerBufferSize: 10

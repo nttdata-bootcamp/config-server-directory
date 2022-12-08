@@ -1,0 +1,14 @@
+server:
+  port: 7000
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+         git:
+          default-label: master
+          uri: https://github.com/jhonatan-maza/bootcamp-config-server
+          search-paths: config-data
+      
